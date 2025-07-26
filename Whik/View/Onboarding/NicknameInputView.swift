@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
 final class NicknameInputView: UIView {
     
@@ -34,6 +36,12 @@ final class NicknameInputView: UIView {
         return textField
     }()
     
+    var nickname: String {
+        return textField.text ?? ""
+    }
+    
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
@@ -42,6 +50,8 @@ final class NicknameInputView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Layout
     
     private func setupLayout() {
         self.addSubviews(
@@ -61,5 +71,3 @@ final class NicknameInputView: UIView {
         }
     }
 }
-
-

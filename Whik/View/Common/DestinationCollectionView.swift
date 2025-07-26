@@ -5,6 +5,13 @@
 //  Created by Eden on 7/27/25.
 //
 
+//
+//  DestinationCollectionView.swift
+//  Whik
+//
+//  Created by Eden on 7/27/25.
+//
+
 import UIKit
 import SnapKit
 import Then
@@ -15,12 +22,8 @@ final class DestinationCollectionView: UICollectionView {
 
     private let destinations: [Destination] = [
         Destination(id: "1", koreanName: "도쿄", englishName: "Tokyo", description: "도쿄", imageURL: nil, imageName: "tokyo", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "seoul", tags: [], reviews: []),
+        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "", tags: [], reviews: []), // intentionally empty
+        Destination(id: "3", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "", tags: [], reviews: []),
     ]
 
     // MARK: - Init
@@ -60,7 +63,23 @@ extension DestinationCollectionView: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DestinationCell.id, for: indexPath) as? DestinationCell else {
             return UICollectionViewCell()
         }
-        cell.configure(with: destinations[indexPath.item])
+
+        var destination = destinations[indexPath.item]
+
+        if destination.imageName.isEmpty {
+            destination = Destination(
+                id: destination.id,
+                koreanName: destination.koreanName,
+                englishName: destination.englishName,
+                description: destination.description,
+                imageURL: destination.imageURL,
+                imageName: "sampleImage", // fallback
+                tags: destination.tags,
+                reviews: destination.reviews
+            )
+        }
+
+        cell.configure(with: destination)
         return cell
     }
 }

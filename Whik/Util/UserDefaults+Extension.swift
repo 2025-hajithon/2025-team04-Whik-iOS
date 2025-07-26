@@ -8,23 +8,13 @@
 import Foundation
 
 extension UserDefaults {
+    
     // MARK: Onboarding
     private enum Keys {
-        static let userUUID = "userUUID"
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
+        static let memberId = "memberId"
     }
     
-    var userUUID: String {
-        get {
-            if let existing = string(forKey: Keys.userUUID) {
-                return existing
-            } else {
-                let newUUID = UUID().uuidString
-                set(newUUID, forKey: Keys.userUUID)
-                return newUUID
-            }
-        }
-    }
     
     var hasCompletedOnboarding: Bool {
         get {
@@ -36,7 +26,20 @@ extension UserDefaults {
     }
     
     func resetOnboardingFlag() {
-        removeObject(forKey: Keys.userUUID)
         removeObject(forKey: Keys.hasCompletedOnboarding)
+    }
+    
+    // MARK: - Member ID (UUID)
+    var memberId: String? {
+        get {
+            string(forKey: Keys.memberId)
+        }
+        set {
+            set(newValue, forKey: Keys.memberId)
+        }
+    }
+    
+    func removeMemberId() {
+        removeObject(forKey: Keys.memberId)
     }
 }
