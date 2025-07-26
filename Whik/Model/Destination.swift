@@ -26,3 +26,8 @@ struct Review {
     let date: Date
     let imageName: String?
 }
+
+struct DestinationQuery: Encodable {
+    let memberId: String
+    let experienceType: String // "FAMILIAR" 또는 "UNFAMILIAR"
+}

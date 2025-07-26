@@ -5,13 +5,6 @@
 //  Created by Eden on 7/27/25.
 //
 
-//
-//  DestinationCollectionView.swift
-//  Whik
-//
-//  Created by Eden on 7/27/25.
-//
-
 import UIKit
 import SnapKit
 import Then
@@ -21,9 +14,10 @@ final class DestinationCollectionView: UICollectionView {
     // MARK: - Properties
 
     private let destinations: [Destination] = [
-        Destination(id: "1", koreanName: "도쿄", englishName: "Tokyo", description: "도쿄", imageURL: nil, imageName: "tokyo", tags: [], reviews: []),
-        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "", tags: [], reviews: []), // intentionally empty
-        Destination(id: "3", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "", tags: [], reviews: []),
+        Destination(id: "1", koreanName: "도쿄", englishName: "Tokyo", description: "도쿄", imageURL: nil, imageName: "", tags: [], reviews: []),
+        Destination(id: "2", koreanName: "서울", englishName: "Seoul", description: "서울", imageURL: nil, imageName: "", tags: [], reviews: []),
+        Destination(id: "3", koreanName: "로마", englishName: "Rome", description: "로마", imageURL: nil, imageName: "", tags: [], reviews: []),
+        Destination(id: "3", koreanName: "상하이", englishName: "Shanghai", description: "상하이", imageURL: nil, imageName: "", tags: [], reviews: []),
     ]
 
     // MARK: - Init
