@@ -11,7 +11,7 @@ import SnapKit
 final class ConfirmView: UIView {
     
     private let pickImageView = UIImageView().then {
-        $0.image = UIImage(named: "pickImage")
+        $0.image = UIImage(named: "pickIcon")
         $0.contentMode = .scaleAspectFit
     }
 

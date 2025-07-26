@@ -32,7 +32,7 @@ final class HomeViewController: UIViewController {
         cardStack.snp.makeConstraints {
             $0.top.equalTo(homeView.tagStackView.snp.bottom).offset(24)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalToSuperview().inset(40)
+            $0.height.equalTo(440)
         }
     }
     
@@ -114,9 +114,22 @@ extension HomeViewController: SwipeCardStackDataSource, SwipeCardStackDelegate {
             self?.present(detailVC, animated: true)
         }
         
+        card.onSelectIconTapped = { [weak self] in
+            guard let self = self else { return }
+            
+            let destination = self.destinations[index]
+            let probability = Double.random(in: 0.001...0.01) // 예시 확률 (0.1% ~ 1%)
+            
+            let modal = DestinationFoundModalViewController(
+                destinationName: destination.koreanName,
+                probability: probability
+            )
+            
+            self.present(modal, animated: true, completion: nil)
+        }
+        
         return card
     }
-    
     
     func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
         switch direction {
@@ -124,8 +137,6 @@ extension HomeViewController: SwipeCardStackDataSource, SwipeCardStackDelegate {
             print("❌ 싫어요 - \(destinations[index].englishName)")
         case .right:
             print("❤️ 좋아요 - \(destinations[index].englishName)")
-        case .up:
-            print("✅ 선택 완료 - \(destinations[index].englishName)")
         default:
             break
         }
