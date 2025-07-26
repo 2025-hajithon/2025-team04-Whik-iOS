@@ -23,7 +23,7 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         setupCardStack()
-        loadMockData()
+        loadData()
     }
     
     private func setupLayout() {
@@ -41,8 +41,9 @@ final class HomeViewController: UIViewController {
         cardStack.dataSource = self
     }
     
-    private func loadMockData() {
-        user = User(name: "이든", matchRate: 99)
+    private func loadData() {
+        let nickname = UserDefaults.standard.nickname ?? "게스트"
+        user = User(name: nickname, matchRate: 99)
         destinations = [
             Destination(
                 id: UUID().uuidString,
@@ -91,6 +92,51 @@ final class HomeViewController: UIViewController {
                     Review(id: UUID().uuidString, userName: "정민수", rating: 3, comment: "사람이 너무 많아서 정신없었지만, 그게 또 매력!", date: Date(), imageName: nil),
                     Review(id: UUID().uuidString, userName: "장예린", rating: 4, comment: "센트럴파크에서 산책 정말 좋았어요.", date: Date(), imageName: nil)
                 ]
+            ),Destination(
+                id: UUID().uuidString,
+                koreanName: "뉴욕",
+                englishName: "New York",
+                description: "문화와 예술, 음식이 풍부한 도시입니다.",
+                imageURL: nil,
+                imageName: "sampleImage",
+                tags: ["도시 감성", "야경이 멋진", "먹거리가 풍부한"],
+                reviews: [
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "정민수", rating: 3, comment: "사람이 너무 많아서 정신없었지만, 그게 또 매력!", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "장예린", rating: 4, comment: "센트럴파크에서 산책 정말 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "홍길동", rating: 4, comment: "전통과 현대가 어우러진 느낌이 좋아요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil)
+                ]
+            ),Destination(
+                id: UUID().uuidString,
+                koreanName: "뉴욕",
+                englishName: "New York",
+                description: "문화와 예술, 음식이 풍부한 도시입니다.",
+                imageURL: nil,
+                imageName: "sampleImage",
+                tags: ["도시 감성", "야경이 멋진", "먹거리가 풍부한"],
+                reviews: [
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "정민수", rating: 3, comment: "사람이 너무 많아서 정신없었지만, 그게 또 매력!", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "장예린", rating: 4, comment: "센트럴파크에서 산책 정말 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "홍길동", rating: 4, comment: "전통과 현대가 어우러진 느낌이 좋아요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil)
+                ]
+            ),Destination(
+                id: UUID().uuidString,
+                koreanName: "뉴욕",
+                englishName: "New York",
+                description: "문화와 예술, 음식이 풍부한 도시입니다.",
+                imageURL: nil,
+                imageName: "sampleImage",
+                tags: ["도시 감성", "야경이 멋진", "먹거리가 풍부한"],
+                reviews: [
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "정민수", rating: 3, comment: "사람이 너무 많아서 정신없었지만, 그게 또 매력!", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "장예린", rating: 4, comment: "센트럴파크에서 산책 정말 좋았어요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "홍길동", rating: 4, comment: "전통과 현대가 어우러진 느낌이 좋아요.", date: Date(), imageName: nil),
+                    Review(id: UUID().uuidString, userName: "박서연", rating: 5, comment: "브로드웨이 공연 최고였어요! 먹거리도 다양해서 좋았어요.", date: Date(), imageName: nil)
+                ]
             )
         ]
         
@@ -118,7 +164,7 @@ extension HomeViewController: SwipeCardStackDataSource, SwipeCardStackDelegate {
             guard let self = self else { return }
             
             let destination = self.destinations[index]
-            let probability = Double.random(in: 0.001...0.01) // 예시 확률 (0.1% ~ 1%)
+            let probability = Double.random(in: 0.2...0.999) // 예시 확률 (0.1% ~ 1%)
             
             let modal = DestinationFoundModalViewController(
                 destinationName: destination.koreanName,

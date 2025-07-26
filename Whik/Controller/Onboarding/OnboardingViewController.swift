@@ -99,17 +99,15 @@ final class OnboardingViewController: UIViewController {
     @objc private func nextButtonTapped() {
         switch currentStep {
         case 0:
-            // Step 0: 닉네임 입력 → 서버 등록
             guard let nicknameView = steps[0] as? NicknameInputView else { return }
-            let nickname = nicknameView.nickname.trimmingCharacters(in: .whitespaces)
+            let nickname = nicknameView.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
             
             guard !nickname.isEmpty else {
                 print("⚠️ 닉네임이 비어있습니다.")
-                // TODO: alert 표시 등 추가 가능
                 return
             }
             
-            // MARK: 멤버 등록
+            // MARK: POST 멤버 등록
             NetworkManager.shared.postStringBody(
                 path: "/members",
                 body: nickname
@@ -118,13 +116,13 @@ final class OnboardingViewController: UIViewController {
                 case .success(let response):
                     print("✅ memberId 저장됨:", response.memberId)
                     UserDefaults.standard.memberId = response.memberId
+                    UserDefaults.standard.nickname = nickname /// 닉네임도 저장
                     
                     self?.currentStep += 1
                     self?.showCurrentStep()
                     
                 case .failure(let error):
                     print("❌ 멤버 생성 실패:", error.localizedDescription)
-                    // TODO: 실패 UI 처리
                 }
             }
             
