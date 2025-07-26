@@ -18,11 +18,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let rootViewController: UIViewController
-        if UserDefaults.standard.hasCompletedOnboarding {
-            rootViewController = TabBarController()
-        } else {
+//        if UserDefaults.standard.hasCompletedOnboarding {
+//            rootViewController = TabBarController()
+//        } else {
             rootViewController = OnboardingViewController()
-        }
+//        }
         
         window.rootViewController = rootViewController
         self.window = window

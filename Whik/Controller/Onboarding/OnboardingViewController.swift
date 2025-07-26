@@ -6,123 +6,76 @@
 //
 
 import UIKit
-import SnapKit
-import Then
 
 final class OnboardingViewController: UIViewController {
     
-    private let logoImageView = UIImageView().then {
-        $0.image = UIImage(named: "whikLogo")
-        $0.contentMode = .scaleAspectFit
-    }
+    private let onboardingView = OnboardingView()
     
-    private let progressView = UIProgressView(progressViewStyle: .default).then {
-        $0.progressTintColor = .whikPrimary
-        $0.trackTintColor = .lightGray
-        $0.setProgress(0.0, animated: false)
-        $0.layer.cornerRadius = 5
-        $0.transform = CGAffineTransform(scaleX: 1.0, y: 2.5)
-        $0.clipsToBounds = true
-    }
-    
-    private let containerView = UIView()
-    
-    private let nextButton = UIButton(type: .system).then {
-        $0.setTitle("다음", for: .normal)
-        $0.titleLabel?.font = .Style.body1
-        $0.setTitleColor(.white, for: .normal)
-        $0.backgroundColor = .whikPrimary
-        $0.layer.cornerRadius = 25
-    }
+    private var categoryMap: [String: String] = [:]
     
     private var currentStep: Int = 0
-    
     private var selectedTags: Set<String> = []
     
     private let steps: [UIView] = [
         NicknameInputView(),
-//        CitySelectView(),
         KeywordSelectView(),
         ConfirmView()
     ]
     
+    override func loadView() {
+        self.view = onboardingView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupLayout()
+        onboardingView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         showCurrentStep()
     }
     
-    private func setupUI() {
-        view.backgroundColor = .white
-        view.addSubviews(logoImageView, progressView, containerView, nextButton)
-        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
-    }
-    
-    private func setupLayout() {
-        logoImageView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(8)
-            $0.leading.equalToSuperview().inset(20)
-            $0.width.equalTo(80)
-            $0.height.equalTo(28)
-        }
-        
-        progressView.snp.makeConstraints {
-            $0.top.equalTo(logoImageView.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(4)
-        }
-        
-        containerView.snp.makeConstraints {
-            $0.top.equalTo(progressView.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(nextButton.snp.top).offset(-12)
-        }
-        
-        nextButton.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(12)
-            $0.height.equalTo(50)
-        }
-    }
-    
     private func showCurrentStep() {
-        containerView.subviews.forEach { $0.removeFromSuperview() }
+        onboardingView.containerView.subviews.forEach { $0.removeFromSuperview() }
         let stepView = steps[currentStep]
-        containerView.addSubview(stepView)
+        onboardingView.containerView.addSubview(stepView)
         stepView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
         let isConfirmStep = stepView is ConfirmView
-        progressView.isHidden = isConfirmStep
-        nextButton.isHidden = isConfirmStep
+        onboardingView.progressView.isHidden = isConfirmStep
+        onboardingView.nextButton.isHidden = isConfirmStep
         
-        if !progressView.isHidden {
+        if !onboardingView.progressView.isHidden {
             let progressSteps = steps.filter { !($0 is ConfirmView) }.count
             let currentVisibleIndex = min(currentStep, progressSteps - 1)
-            progressView.setProgress(Float(currentVisibleIndex + 1) / Float(progressSteps), animated: true)
+            onboardingView.progressView.setProgress(Float(currentVisibleIndex + 1) / Float(progressSteps), animated: true)
         }
         
-        if currentStep == 1 {
-            nextButton.setTitle("완료", for: .normal)
-        } else {
-            nextButton.setTitle("다음", for: .normal)
-        }
+        onboardingView.nextButton.setTitle(currentStep == 1 ? "완료" : "다음", for: .normal)
         
         if let keywordView = stepView as? KeywordSelectView {
             keywordView.onTagTapped = { [weak self] button in
                 self?.handleTagSelection(for: button)
             }
             
-            keywordView.configureTags([
-                "음식이 담백한", "배고픔", "자연", "야경", "사람 많은", "응애", "오션뷰", "온천", "랜드마크"
-            ])
+            // MARK: 카테고리 리스트 가져오기
+            NetworkManager.shared.get(path: "/categories") { [weak self] (result: Result<[CategoryModel], Error>) in
+                switch result {
+                case .success(let categories):
+                    let tagNames = categories.map { $0.value }
+                    self?.categoryMap = categories.reduce(into: [:]) { result, item in
+                        if result[item.value] == nil {
+                            result[item.value] = item.category
+                        }
+                    }
+                    keywordView.configureTags(tagNames)
+                    
+                case .failure(let error):
+                    print("❌ 태그 목록 로딩 실패:", error)
+                }
+            }
+            
         }
         
-        // ConfirmView일 경우: 온보딩 완료 저장 + 3초 뒤 메인으로 이동
         if isConfirmStep {
-            // TODO: 사용자 정보 저장하며, 서버로 정보 넘겨주기
             UserDefaults.standard.hasCompletedOnboarding = true
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
                 self?.navigateToMain()
             }
@@ -141,16 +94,71 @@ final class OnboardingViewController: UIViewController {
             button.backgroundColor = .whikPrimary
             button.setTitleColor(.white, for: .normal)
         }
-        
-        print("✅ 현재 선택된 태그: \(selectedTags)")
     }
     
     @objc private func nextButtonTapped() {
-        if currentStep < steps.count - 1 {
-            currentStep += 1
-            showCurrentStep()
-        } else {
-            // TODO: 마지막 단계일 경우 서버에 UUID + 정보 전달
+        switch currentStep {
+        case 0:
+            // Step 0: 닉네임 입력 → 서버 등록
+            guard let nicknameView = steps[0] as? NicknameInputView else { return }
+            let nickname = nicknameView.nickname.trimmingCharacters(in: .whitespaces)
+            
+            guard !nickname.isEmpty else {
+                print("⚠️ 닉네임이 비어있습니다.")
+                // TODO: alert 표시 등 추가 가능
+                return
+            }
+            
+            // MARK: 멤버 등록
+            NetworkManager.shared.postStringBody(
+                path: "/members",
+                body: nickname
+            ) { [weak self] (result: Result<MemberResponse, Error>) in
+                switch result {
+                case .success(let response):
+                    print("✅ memberId 저장됨:", response.memberId)
+                    UserDefaults.standard.memberId = response.memberId
+                    
+                    self?.currentStep += 1
+                    self?.showCurrentStep()
+                    
+                case .failure(let error):
+                    print("❌ 멤버 생성 실패:", error.localizedDescription)
+                    // TODO: 실패 UI 처리
+                }
+            }
+            
+        case 1:
+            // MARK: 태그 선택 → 서버에 POST /member-categories
+            guard let memberId = UserDefaults.standard.memberId else {
+                print("❌ memberId 없음")
+                return
+            }
+            
+            let selectedCategoryCodes = selectedTags.compactMap { categoryMap[$0] }
+            
+            let request = MemberCategoryRequest(
+                memberId: memberId,
+                categories: selectedCategoryCodes
+            )
+            
+            // MARK: 카테고리 등록 POST
+            NetworkManager.shared.postWithoutDecoding(
+                path: "/member-categories",
+                body: request
+            ) { [weak self] result in
+                switch result {
+                case .success:
+                    print("✅ 카테고리 등록 성공")
+                    self?.currentStep += 1
+                    self?.showCurrentStep()
+                case .failure(let error):
+                    print("❌ 카테고리 등록 실패:", error.localizedDescription)
+                }
+            }
+
+        default:
+            break
         }
     }
     
