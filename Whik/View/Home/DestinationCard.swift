@@ -12,6 +12,8 @@ import Then
 
 final class DestinationCard: SwipeCard {
     
+    var onTap: (() -> Void)?
+    
     private let imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.clipsToBounds = true
@@ -67,6 +69,12 @@ final class DestinationCard: SwipeCard {
         titleStack.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(16)
         }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
+        self.addGestureRecognizer(tapGesture)
     }
     
+    @objc private func cardTapped() {
+        onTap?()
+    }
 }
